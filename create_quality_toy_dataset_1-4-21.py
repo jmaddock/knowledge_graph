@@ -19,7 +19,7 @@ import bz2
 
 def process(infile,outfile,article_list,logger=None):
         rd = csv.reader(infile, delimiter="\t", quoting=csv.QUOTE_NONE)
-        w = csv.writer(outfile, delimiter=",", quoting=csv.QUOTE_NONE)
+        w = csv.writer(outfile, delimiter=",", escapechar="\\")
         i = 0
         j = 0
         try:
