@@ -18,19 +18,26 @@ import logging
 import bz2
 
 def process(infile,outfile,article_list,logger=None):
-        rd = csv.reader(infile, delimiter="\t", quotechar='"')
-        w = csv.writer(outfile, delimiter=",", quotechar='"')
+        rd = csv.reader(infile, delimiter="\t", quoting=csv.QUOTE_NONE)
+        w = csv.writer(outfile, delimiter=",", quoting=csv.QUOTE_NONE)
+        i = 0
         j = 0
-        for i,row in enumerate(rd):
-            if i == 0:
-                w.writerow(row)
-            else:
-                if np.int64(row[0]) in article_list:
+        try:
+            for row in rd:
+                if i == 0:
                     w.writerow(row)
-                    j += 1
+                else:
+                    if np.int64(row[0]) in article_list:
+                        w.writerow(row)
+                        j += 1
+                i += 1
+                if i % 100000 == 0 and i != 0 and logger:
+                    logger.debug('processed {0} rows, wrote {1} rows'.format(i,j))
+                
+        except csv.Error as e:
+            logger.error('error at line {0}'.format(i))
+            logger.error(e)
 
-            if i % 100000 == 0 and i != 0 and logger:
-                logger.debug('processed {0} rows, wrote {1} rows'.format(i,j))
         if logger:
             logger.debug('found {0} of {1} articles'.format(j,len(article_list)))
             
